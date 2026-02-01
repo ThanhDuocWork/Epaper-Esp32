@@ -13,7 +13,7 @@ Typical characteristics of e-paper:
 - **Ultra-low power** when the image is static (power mostly used during refresh)
 - **Excellent readability** under ambient light (sunlight-friendly)
 - **Slow refresh** compared to LCD/OLED (best for “information display”, not video)
-![Overview](Image/mainMD/Overview.png)
+![Overview](Image/mainMD/Overview.jpg)
 ---
 
 ## Key Specs (4.2")
@@ -28,7 +28,7 @@ Typical characteristics of e-paper:
 | Power | Often supports 3.3V–5V supply (module-level) |
 | Driver IC | Commonly listed as **SSD1683** (may vary by panel) |
 
-![Specs](Image/mainMD/Specs.png)
+![Specs](Image/mainMD/Specs.jpg)
 
 ---
 

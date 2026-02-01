@@ -1,53 +1,41 @@
-| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C5 | ESP32-C6 | ESP32-C61 | ESP32-H2 | ESP32-H21 | ESP32-H4 | ESP32-P4 | ESP32-S2 | ESP32-S3 | Linux |
-| ----------------- | ----- | -------- | -------- | -------- | -------- | --------- | -------- | --------- | -------- | -------- | -------- | -------- | ----- |
+# WeAct Studio 4.2" E-Paper Module (EPD) — Product Overview
 
-# Hello World Example
+This README describes the **WeAct Studio 4.2-inch e-paper (E-Ink) module** and how this repository is organized (docs, hardware files, examples, images, tools).  
 
-Starts a FreeRTOS task to print "Hello World".
+---
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+## What is the WeAct 4.2" E-Paper Module?
 
-## How to use example
+The WeAct 4.2" EPD is a low-power, reflective display module designed for **high-contrast, paper-like viewing**.  
+It is well-suited for dashboards, labels, clocks, calendars, sensor panels, and battery-powered projects.
 
-Follow detailed instructions provided specifically for this example.
+Typical characteristics of e-paper:
+- **Ultra-low power** when the image is static (power mostly used during refresh)
+- **Excellent readability** under ambient light (sunlight-friendly)
+- **Slow refresh** compared to LCD/OLED (best for “information display”, not video)
+![Overview](Image/mainMD/Overview.png)
+---
 
-Select the instructions depending on Espressif chip installed on your development board:
+## Key Specs (4.2")
 
-- [ESP32 Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started/index.html)
-- [ESP32-S2 Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/get-started/index.html)
+| Item | Value |
+|---|---|
+| Display size | 4.2 inch |
+| Resolution | 400 × 300 |
+| Display color | Black / White |
+| Interface | SPI (4-wire SPI commonly used) |
+| I/O level | 3.3V logic (recommended) |
+| Power | Often supports 3.3V–5V supply (module-level) |
+| Driver IC | Commonly listed as **SSD1683** (may vary by panel) |
 
+![Specs](Image/mainMD/Specs.png)
 
-## Example folder contents
+---
 
-The project **hello_world** contains one source file in C language [hello_world_main.c](main/hello_world_main.c). The file is located in folder [main](main).
+## References
 
-ESP-IDF projects are built using CMake. The project build configuration is contained in `CMakeLists.txt` files that provide set of directives and instructions describing the project's source files and targets (executable, library, or both).
+- WeAct Studio Epaper Module repository: https://github.com/WeActStudio/WeActStudio.EpaperModule :contentReference
+- Hardware schematic document (GitHub):  
+  https://github.com/WeActStudio/WeActStudio.EpaperModule/blob/master/Hardware/WeAct-EpaperModule%20SchDoc.pdf
+---
 
-Below is short explanation of remaining files in the project folder.
-
-```
-├── CMakeLists.txt
-├── pytest_hello_world.py      Python script used for automated testing
-├── main
-│   ├── CMakeLists.txt
-│   └── hello_world_main.c
-└── README.md                  This is the file you are currently reading
-```
-
-For more information on structure and contents of ESP-IDF projects, please refer to Section [Build System](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html) of the ESP-IDF Programming Guide.
-
-## Troubleshooting
-
-* Program upload failure
-
-    * Hardware connection is not correct: run `idf.py -p PORT monitor`, and reboot your board to see if there are any output logs.
-    * The baud rate for downloading is too high: lower your baud rate in the `menuconfig` menu, and try again.
-
-## Technical support and feedback
-
-Please use the following feedback channels:
-
-* For technical queries, go to the [esp32.com](https://esp32.com/) forum
-* For a feature request or bug report, create a [GitHub issue](https://github.com/espressif/esp-idf/issues)
-
-We will get back to you as soon as possible.

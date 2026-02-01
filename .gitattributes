@@ -1,0 +1,6 @@
+# Treat images as binary (never modify line endings)
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+*.webp binary
+*.gif  binary

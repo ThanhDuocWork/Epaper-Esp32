@@ -15,6 +15,7 @@ Typical characteristics of e-paper:
 - **Slow refresh** compared to LCD/OLED (best for “information display”, not video)
 
 ![Overview](Image/MainMD/Overview_OK.png)
+![Overview](https://github.com/ThanhDuocWork/Epaper-Esp32/issues/1)
 
 ---
 
@@ -31,7 +32,7 @@ Typical characteristics of e-paper:
 | Driver IC | Commonly listed as **SSD1683** (may vary by panel) |
 
 ![Specs](Image/MainMD/Specs_OK.png)
-
+![Specs](https://github.com/ThanhDuocWork/Epaper-Esp32/issues/2)
 ---
 
 ## References

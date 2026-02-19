@@ -1,0 +1,22 @@
+idf_component_register(
+    SRCS
+        "epaper_driver_bsp/epaper_driver_bsp.cpp"
+        "board_power_bsp/board_power_bsp.cpp"
+        "user_app/user_app.cpp"
+        "ui_bsp/custom/custom.c"
+        "ui_bsp/generated/events_init.c"
+        "ui_bsp/generated/gui_guider.c"
+        "ui_bsp/generated/setup_scr_screen.c"
+        "ui_bsp/generated/widgets_init.c"
+    INCLUDE_DIRS
+        "."
+        "epaper_driver_bsp"
+        "board_power_bsp"
+        "user_app"
+        "ui_bsp/custom"
+        "ui_bsp/generated"
+        "ui_bsp/generated/guider_customer_fonts"
+        "ui_bsp/generated/images"
+    REQUIRES
+        lvgl epd
+)

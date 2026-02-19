@@ -1,0 +1,16 @@
+idf_component_register(
+    SRCS
+        "custom/custom.c"
+        "generated/gui_guider.c"
+        "generated/events_init.c"
+        "generated/widgets_init.c"
+        "generated/setup_scr_screen.c"
+    INCLUDE_DIRS
+        "."
+        "custom"
+        "generated"
+        "generated/guider_customer_fonts"
+        "generated/images"
+    REQUIRES
+        lvgl
+)

@@ -10,6 +10,43 @@
 #define EPD_H 300
 #define BUSY_TIMEOUT_MS 20000
 
+#define EPD_INVERT_I1  0
+
+static void set_full_ram_area(void);
+static void update_full(void);
+
+void ssd1683_draw_full(const uint8_t *buf)
+{
+    if (!buf) return;
+
+    set_full_ram_area();
+
+    epd_hal_send_command(0x24); // write RAM (current)
+    const int n = (EPD_W * EPD_H / 8);
+
+    for (int i = 0; i < n; i++)
+    {
+#if EPD_INVERT_I1
+        epd_hal_send_data((uint8_t)~buf[i]);
+#else
+        epd_hal_send_data(buf[i]);
+#endif
+    }
+
+    update_full();
+}
+void ssd1683_draw_1bpp_full(const uint8_t *buf_1bpp)
+{
+    // full window + write RAM 0x24 + update_full()
+    set_full_ram_area();
+
+    epd_hal_send_command(0x24);
+    for (int i = 0; i < (EPD_W * EPD_H / 8); i++) {
+        epd_hal_send_data(buf_1bpp[i]);
+    }
+    update_full();
+}
+
 static const char *TAG = "EPD";
 
 static void wait_busy(uint32_t timeout_ms)

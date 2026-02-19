@@ -14,5 +14,6 @@
     "--background-index",
     "--query-driver=**",
     "--compile-commands-dir=d:\\00.LabESP32\\04.epaperIDF\\ePaper-IDF\\build"
-  ]
+  ],
+  "idf.currentSetup": "C:\\Users\\thanh\\esp\\v5.5.1\\esp-idf"
 }

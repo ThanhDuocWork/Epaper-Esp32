@@ -27,46 +27,31 @@ static inline void fb_set_px_1bpp(uint16_t x, uint16_t y, int is_black)
     else
         s_fb_1bpp[i] |= m;
 }
-
-static void lv_flush_cb(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
+static volatile bool s_need_refresh = false;
+static void lv_flush_cb(lv_display_t *display,
+                        const lv_area_t *area,
+                        uint8_t *px_map)
 {
-    // px_map buffer RGB565 (lv_color_t)
     lv_color_t *cbuf = (lv_color_t *)px_map;
 
     for (int y = area->y1; y <= area->y2; y++)
     {
         for (int x = area->x1; x <= area->x2; x++)
         {
-
-            // convert RGB565 -> grayscale
-            // lv_color_t on v9 is 16-bit 565
             lv_color_t c = *cbuf++;
-            uint32_t v = lv_color_to_u32(c); // ra 0xRRGGBB
+            uint32_t v = lv_color_to_u32(c);
 
             uint8_t r = (v >> 16) & 0xFF;
             uint8_t g = (v >> 8) & 0xFF;
             uint8_t b = (v >> 0) & 0xFF;
 
-            // scale to 0..255
-            uint8_t rr = (r * 255) / 31;
-            uint8_t gg = (g * 255) / 63;
-            uint8_t bb = (b * 255) / 31;
+            uint16_t gray = (r * 30 + g * 59 + b * 11) / 100;
 
-            // luminance
-            uint16_t gray = (rr * 30 + gg * 59 + bb * 11) / 100;
-
-            // threshold: <128 => black
             fb_set_px_1bpp(x, y, gray < 128);
         }
     }
-    // full refresh only: After each flush, full refresh the entire area immediately.
-    // But LVGL flushes multiple times -> it will slow down.
-    // => Strategy: Only refresh when the area is full screen (simple)
-    if (area->x1 == 0 && area->y1 == 0 && area->x2 == (EPD_W - 1) && area->y2 == (EPD_H - 1))
-    {
-        // push s_fb_1bpp to epaper
-        ssd1683_draw_1bpp_full(s_fb_1bpp);
-        ESP_LOGI(TAG, "Full flush -> refresh");
+    if (area->x1 == 0 && area->x2 == (EPD_W - 1) && area->y2 == (EPD_H - 1)) {
+        s_need_refresh = true;
     }
 
     lv_display_flush_ready(display);
@@ -93,4 +78,25 @@ void epd_lvgl_init(void)
         LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     ESP_LOGI(TAG, "LVGL display inited %dx%d", EPD_W, EPD_H);
+}
+#include <string.h>
+#include "esp_log.h"
+
+void epd_lvgl_fill_screen(int black)
+{
+    // SSD1683: 1 = white, 0 = black
+    memset(s_fb_1bpp, black ? 0x00 : 0xFF, sizeof(s_fb_1bpp));
+    ESP_LOGI(TAG, "fill_screen: %s", black ? "BLACK" : "WHITE");
+    // Full refresh 
+    ssd1683_draw_1bpp_full(s_fb_1bpp);
+}
+void epd_lvgl_flush_full(void)
+{
+    ssd1683_draw_1bpp_full(s_fb_1bpp);
+}
+void epd_lvgl_poll_refresh(void)
+{
+    if (s_need_refresh) {
+        s_need_refresh = false;
+        ssd1683_draw_1bpp_full(s_fb_1bpp);   
 }

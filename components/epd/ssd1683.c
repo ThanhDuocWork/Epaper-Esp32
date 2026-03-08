@@ -37,13 +37,23 @@ void ssd1683_draw_full(const uint8_t *buf)
 }
 void ssd1683_draw_1bpp_full(const uint8_t *buf_1bpp)
 {
-    // full window + write RAM 0x24 + update_full()
     set_full_ram_area();
 
-    epd_hal_send_command(0x24);
+    // Write previous image (0x26)
+    epd_hal_send_command(0x26);  // Write previous image to RAM
     for (int i = 0; i < (EPD_W * EPD_H / 8); i++) {
         epd_hal_send_data(buf_1bpp[i]);
+        vTaskDelay(pdMS_TO_TICKS(1));  // Delay after each SPI command
     }
+
+    // Write current image (0x24)
+    epd_hal_send_command(0x24);  // Write current image to RAM
+    for (int i = 0; i < (EPD_W * EPD_H / 8); i++) {
+        epd_hal_send_data(buf_1bpp[i]);
+        vTaskDelay(pdMS_TO_TICKS(1));  // Delay after each SPI command
+    }
+
+    // Update
     update_full();
 }
 
@@ -171,19 +181,19 @@ void ssd1683_draw_demo_box_text(void)
     epd_gfx_t g;
     epd_gfx_init(&g, fb);
 
-    // nền trắng
+    // white background
     epd_gfx_clear(&g, true);
 
-    // khung ngoài (đen)
+    // outer border 
     epd_gfx_rect(&g, 5, 5, EPD_W - 10, EPD_H - 10, false);
 
-    // khung trong
+    // inner border
     epd_gfx_rect(&g, 20, 40, EPD_W - 40, 120, false);
 
-    // tiêu đề
+    // title    
     epd_gfx_print(&g, 30, 15, "GDEY042T81 (BW)\nSSD1683 FULL REFRESH", false, 2);
 
-    // text trong khung
+    // text in box
     epd_gfx_print(&g, 30, 60, "Hello IDF!\nBox + Text OK", false, 2);
 
     // flush

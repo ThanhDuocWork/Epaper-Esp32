@@ -21,9 +21,9 @@ void epd_hal_spi_init(void)
     };
 
     spi_device_interface_config_t devcfg = {
-        .clock_speed_hz = 2 * 1000 * 1000,
+        .clock_speed_hz = 4 * 1000 * 1000,
         .mode = 0,
-        .spics_io_num = EPD_PIN_CS,   // ✅ để IDF tự kéo CS
+        .spics_io_num = EPD_PIN_CS,  
         .queue_size = 1,
     };
 

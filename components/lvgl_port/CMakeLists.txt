@@ -18,5 +18,8 @@ idf_component_register(
         "ui_bsp/generated/guider_customer_fonts"
         "ui_bsp/generated/images"
     REQUIRES
-        lvgl epd
+        driver
+        freertos
+        log
+        lvgl
 )

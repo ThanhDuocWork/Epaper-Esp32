@@ -3,7 +3,6 @@
 #include "esp_timer.h"
 #include "lvgl.h"
 #include "epd_lvgl.h"
-#include "ssd1683.h"
 
 static esp_timer_handle_t s_lv_tick_timer;
 
@@ -25,12 +24,20 @@ static void lv_tick_timer_init(void)
 
 static void lv_task(void *arg)
 {
-    while (1) {
-        epd_lvgl_fill_screen(0); 
-        vTaskDelay(pdMS_TO_TICKS(5000)); 
+    bool black = false;
 
-        epd_lvgl_fill_screen(1); 
-        vTaskDelay(pdMS_TO_TICKS(5000)); 
+    while (1)
+    {
+        epd_lvgl_fill_screen(black);
+        black = !black;
+
+        for(int i = 0; i < 500; i++)
+        {
+            lv_timer_handler();
+            epd_lvgl_poll_refresh();
+
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
     }
 }
 

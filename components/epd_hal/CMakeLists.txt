@@ -1,0 +1,12 @@
+idf_component_register(
+    SRCS
+        "src/epd_hal.c"
+        "src/epd_hal_gpio.c"
+        "src/epd_hal_spi.c"
+    INCLUDE_DIRS
+        "inc"
+    REQUIRES
+        driver
+        freertos
+        log
+)

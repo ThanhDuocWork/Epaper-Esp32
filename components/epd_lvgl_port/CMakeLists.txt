@@ -1,0 +1,13 @@
+idf_component_register(
+    SRCS
+        "src/epd_lvgl.c"
+    INCLUDE_DIRS
+        "inc"
+    REQUIRES
+        epd_driver
+        epd_gfx
+        epd_hal
+        freertos
+        log
+        lvgl
+)

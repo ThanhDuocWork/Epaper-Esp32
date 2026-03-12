@@ -1,0 +1,11 @@
+idf_component_register(
+    SRCS
+        "src/ssd1683.c"
+    INCLUDE_DIRS
+        "inc"
+    REQUIRES
+        epd_gfx
+        epd_hal
+        freertos
+        log
+)

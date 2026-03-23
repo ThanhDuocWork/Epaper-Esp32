@@ -1,15 +1,19 @@
+#include <stdio.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_timer.h"
-#include "lvgl.h"
+
 #include "epd_lvgl.h"
+#include "lvgl.h"
+#include "ui.h"
 
 static esp_timer_handle_t s_lv_tick_timer;
 
 static void lv_tick_cb(void *arg)
 {
     (void)arg;
-    lv_tick_inc(1); 
+    lv_tick_inc(1);
 }
 
 static void lv_tick_timer_init(void)
@@ -18,37 +22,58 @@ static void lv_tick_timer_init(void)
         .callback = &lv_tick_cb,
         .name = "lv_tick"
     };
+
     ESP_ERROR_CHECK(esp_timer_create(&args, &s_lv_tick_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(s_lv_tick_timer, 1000));
 }
 
+static void ui_demo_init(void)
+{
+    ui_set_status("Booting");
+    ui_set_temperature(24);
+    ui_set_battery(100);
+}
+
+static void ui_demo_step(int step)
+{
+    char status[32];
+
+    snprintf(status, sizeof(status), "Tick %d", step);
+    ui_set_status(status);
+}
+
 static void lv_task(void *arg)
 {
-    bool black = false;
+    TickType_t last_update_tick;
+    int step = 0;
 
-    while (1)
-    {
-        epd_lvgl_fill_screen(black);
-        black = !black;
+    (void)arg;
 
-        for(int i = 0; i < 500; i++)
-        {
-            lv_timer_handler();
-            epd_lvgl_poll_refresh();
+    epd_lvgl_init();
+    lv_tick_timer_init();
+    ui_init();
+    ui_demo_init();
 
-            vTaskDelay(pdMS_TO_TICKS(10));
+    lv_timer_handler();
+    epd_lvgl_flush_full();
+
+    last_update_tick = xTaskGetTickCount();
+
+    while (1) {
+        lv_timer_handler();
+        epd_lvgl_poll_refresh();
+
+        if ((xTaskGetTickCount() - last_update_tick) >= pdMS_TO_TICKS(6000)) {
+            last_update_tick = xTaskGetTickCount();
+            step++;
+            ui_demo_step(step);
         }
+
+        vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
 
 void app_main(void)
 {
-    epd_lvgl_init();
-    lv_tick_timer_init(); 
-    xTaskCreatePinnedToCore(lv_task, "lv_task", 4096, NULL, 5, NULL, 0);
-    ESP_LOGI("MAIN", "lv_task started");
-
-    while (1) {
-        vTaskDelay(pdMS_TO_TICKS(5000)); 
-    }
+    xTaskCreatePinnedToCore(lv_task, "lv_task", 8192, NULL, 5, NULL, 0);
 }

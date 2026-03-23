@@ -1,0 +1,12 @@
+idf_component_register(
+    SRCS
+        "src/ui_screen_main.c"
+        "src/ui_status.c"
+        "../../assets/images/greysacle_Grey_Mona_lisa.c"
+        "../../assets/images/cat.c"
+    INCLUDE_DIRS
+        "include"
+        "../../assets/images"
+    REQUIRES
+        lvgl
+)

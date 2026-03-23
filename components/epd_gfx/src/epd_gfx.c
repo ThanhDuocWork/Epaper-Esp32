@@ -1,7 +1,8 @@
 #include "epd_gfx.h"
+
 #include <string.h>
 
-// Font 5x7 (ASCII 32..127), mỗi ký tự 5 cột, bit0 là hàng trên.
+/* 5x7 font for ASCII 32..127. Each glyph uses 5 columns and bit 0 is the top row. */
 static const uint8_t font5x7[96][5] = {
     // 0x20 ' '
     {0x00,0x00,0x00,0x00,0x00},
@@ -291,3 +292,5 @@ void epd_gfx_print(epd_gfx_t *g, int x, int y, const char *s, bool white, int sc
         s++;
     }
 }
+
+

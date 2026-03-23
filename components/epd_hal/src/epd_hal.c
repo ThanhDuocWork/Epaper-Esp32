@@ -1,8 +1,7 @@
 #include "epd_hal.h"
 #include "epd_pins.h"
 
-// from spi hal
-void epd_hal_spi_init(void);
+/* SPI helper implemented in epd_hal_spi.c. */
 void epd_hal_spi_write(const uint8_t *data, int len);
 
 void epd_hal_send_command(uint8_t cmd)
@@ -23,6 +22,6 @@ void epd_hal_send_data(uint8_t data)
 
 void epd_hal_init(void)
 {
-    epd_hal_gpio_init();    
+    epd_hal_gpio_init();
     epd_hal_spi_init();
 }

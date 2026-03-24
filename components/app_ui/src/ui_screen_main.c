@@ -1,11 +1,16 @@
 #include "ui_screen_main.h"
-
+#include "ui_assets.h"
 #include "lvgl.h"
 #include "ui_internal.h"
+#include "esp_log.h"
+static const char *TAG = "APP_UI";
 
 lv_obj_t *g_ui_label_status;
 lv_obj_t *g_ui_label_temp;
 lv_obj_t *g_ui_label_battery;
+
+static lv_obj_t *s_monalisa_frame;
+static lv_obj_t *s_monalisa_img;
 
 static void style_screen(void)
 {
@@ -57,10 +62,70 @@ static void create_status_panel(void)
     lv_label_set_text(g_ui_label_battery, "Battery: 100%");
     lv_obj_set_pos(g_ui_label_battery, 0, 68);
 }
+static void create_monalisa_panel(void)
+{
+    const int panel_w = 150;
+    const int panel_h = 195;
+    const int img_w = 143;
+    const int img_h = 188;
+
+    const int panel_x = 5;
+    const int panel_y = 5;
+
+    const int img_x = (panel_w - img_w) / 2;
+    const int img_y = (panel_h - img_h) / 2;
+
+    lv_obj_t *panel = create_panel(lv_screen_active(), panel_w, panel_h);
+    lv_obj_set_pos(panel, panel_x, panel_y);
+    lv_obj_set_style_pad_all(panel, 4, 0);
+
+    LV_IMAGE_DECLARE(BASIC256_greysacle_Grey_Mona_lisa);
+    lv_obj_t *img = lv_image_create(panel);
+    lv_image_set_src(img, &BASIC256_greysacle_Grey_Mona_lisa);
+    lv_obj_align(img, LV_ALIGN_CENTER, img_x, img_y);
+    // lv_obj_set_pos(img, img_x, img_y);
+}
+
+static lv_obj_t *create_frame(lv_obj_t *parent, int32_t width, int32_t height)
+{
+    lv_obj_t *frame = lv_obj_create(parent);
+    lv_obj_remove_style_all(frame);
+    lv_obj_set_size(frame, width, height);
+    lv_obj_set_style_bg_color(frame, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(frame, LV_OPA_COVER, 0);
+    lv_obj_set_style_border_color(frame, lv_color_black(), 0);
+    lv_obj_set_style_border_width(frame, 2, 0);
+    lv_obj_set_style_pad_all(frame, 0, 0);
+    return frame;
+}
+
+static void create_monalisa(void)
+{
+    s_monalisa_frame = create_frame(lv_screen_active(), 143, 188);
+    lv_obj_set_pos(s_monalisa_frame, 5, 5);
+
+    s_monalisa_img = lv_image_create(s_monalisa_frame);
+    lv_image_set_src(s_monalisa_img, &BASIC256_greysacle_Grey_Mona_lisa);
+    lv_obj_set_pos(s_monalisa_img, 0, 0);
+}
+
+void ui_set_monalisa_pos(int x, int y)
+{
+    if (!s_monalisa_frame) {
+        return;
+    }
+
+    lv_obj_set_pos(s_monalisa_frame, x, y);
+    ESP_LOGI(TAG, "monalisa x=%d, y=%d", x, y);
+}
+
 
 void ui_init(void)
 {
     style_screen();
-    create_title();
-    create_status_panel();
+    create_monalisa();
+    // style_screen();
+    // create_monalisa_panel();
+    // create_title();
+    // create_status_panel();
 }

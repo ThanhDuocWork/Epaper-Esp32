@@ -27,19 +27,14 @@ static void lv_tick_timer_init(void)
     ESP_ERROR_CHECK(esp_timer_start_periodic(s_lv_tick_timer, 1000));
 }
 
-static void ui_demo_init(void)
+static void monalisa_step(int step)
 {
-    ui_set_status("Booting");
-    ui_set_temperature(24);
-    ui_set_battery(100);
-}
-
-static void ui_demo_step(int step)
-{
-    char status[32];
-
-    snprintf(status, sizeof(status), "Tick %d", step);
-    ui_set_status(status);
+    if ((step & 1) == 0) {
+        ui_set_monalisa_pos(5, 5);
+    }
+    else {
+        ui_set_monalisa_pos(255, 110);
+    }
 }
 
 static void lv_task(void *arg)
@@ -52,7 +47,7 @@ static void lv_task(void *arg)
     epd_lvgl_init();
     lv_tick_timer_init();
     ui_init();
-    ui_demo_init();
+    monalisa_step(step);
 
     lv_timer_handler();
     epd_lvgl_flush_full();
@@ -63,10 +58,10 @@ static void lv_task(void *arg)
         lv_timer_handler();
         epd_lvgl_poll_refresh();
 
-        if ((xTaskGetTickCount() - last_update_tick) >= pdMS_TO_TICKS(6000)) {
+        if ((xTaskGetTickCount() - last_update_tick) >= pdMS_TO_TICKS(5000)) {
             last_update_tick = xTaskGetTickCount();
             step++;
-            ui_demo_step(step);
+            monalisa_step(step);
         }
 
         vTaskDelay(pdMS_TO_TICKS(20));

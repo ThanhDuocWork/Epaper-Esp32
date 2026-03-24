@@ -21,6 +21,12 @@ static void set_ram_pointer(uint16_t x, uint16_t y);
 static void set_full_ram_area(void);
 static void write_screen_buffer(uint8_t cmd, uint8_t value);
 static void write_image_buffer(uint8_t cmd, const uint8_t *buf, int len);
+static void write_partial_region(uint8_t cmd,
+                                 const uint8_t *buf_1bpp,
+                                 uint16_t x1,
+                                 uint16_t y1,
+                                 uint16_t y2,
+                                 uint16_t aligned_w);
 static void update_full(void);
 static void update_partial(void);
 static void enter_partial_mode(void);
@@ -73,7 +79,6 @@ void ssd1683_draw_1bpp_partial(const uint8_t *buf_1bpp,
     uint16_t x2;
     uint16_t y2;
     uint16_t aligned_w;
-    uint8_t line_buf[EPD_W / 8];
 
     if (!buf_1bpp || w == 0 || h == 0 || x >= EPD_W || y >= EPD_H) {
         return;
@@ -95,25 +100,51 @@ void ssd1683_draw_1bpp_partial(const uint8_t *buf_1bpp,
     aligned_w = (uint16_t)(x2 - x1 + 1);
 
     enter_partial_mode();
+    set_ram_area(x1, y1, aligned_w, (uint16_t)(y2 - y1 + 1));
+    set_ram_pointer(x1, y1);
+    write_partial_region(0x24, buf_1bpp, x1, y1, y2, aligned_w);
+    update_partial();
+}
+
+void ssd1683_draw_1bpp_partial_sync_prev(const uint8_t *buf_1bpp,
+                                         uint16_t x,
+                                         uint16_t y,
+                                         uint16_t w,
+                                         uint16_t h)
+{
+    uint16_t x1;
+    uint16_t y1;
+    uint16_t x2;
+    uint16_t y2;
+    uint16_t aligned_w;
+
+    if (!buf_1bpp || w == 0 || h == 0 || x >= EPD_W || y >= EPD_H) {
+        return;
+    }
+
+    x1 = (uint16_t)(x & ~0x07U);
+    y1 = y;
+    x2 = (uint16_t)(x + w - 1);
+    y2 = (uint16_t)(y + h - 1);
+
+    if (x2 >= EPD_W) {
+        x2 = EPD_W - 1;
+    }
+    if (y2 >= EPD_H) {
+        y2 = EPD_H - 1;
+    }
+
+    x2 = (uint16_t)((x2 | 0x07U) < EPD_W ? (x2 | 0x07U) : (EPD_W - 1));
+    aligned_w = (uint16_t)(x2 - x1 + 1);
+
+    enter_partial_mode();
+    set_ram_area(x1, y1, aligned_w, (uint16_t)(y2 - y1 + 1));
+    set_ram_pointer(x1, y1);
+    write_partial_region(0x26, buf_1bpp, x1, y1, y2, aligned_w);
 
     set_ram_area(x1, y1, aligned_w, (uint16_t)(y2 - y1 + 1));
     set_ram_pointer(x1, y1);
-    epd_hal_send_command(0x26);
-    for (uint16_t row = y1; row <= y2; row++) {
-        uint32_t src_index = row * (EPD_W / 8) + (x1 / 8);
-        memcpy(line_buf, &buf_1bpp[src_index], aligned_w / 8);
-        write_image_buffer(0x00, line_buf, aligned_w / 8);
-    }
-
-    set_ram_area(x1, y1, aligned_w, (uint16_t)(y2 - y1 + 1));
-    set_ram_pointer(x1, y1);
-    epd_hal_send_command(0x24);
-    for (uint16_t row = y1; row <= y2; row++) {
-        uint32_t src_index = row * (EPD_W / 8) + (x1 / 8);
-        memcpy(line_buf, &buf_1bpp[src_index], aligned_w / 8);
-        write_image_buffer(0x00, line_buf, aligned_w / 8);
-    }
-
+    write_partial_region(0x24, buf_1bpp, x1, y1, y2, aligned_w);
     update_partial();
 }
 
@@ -185,6 +216,26 @@ static void write_image_buffer(uint8_t cmd, const uint8_t *buf, int len)
 
     for (int i = 0; i < len; i++) {
         epd_hal_send_data(buf[i]);
+    }
+}
+
+static void write_partial_region(uint8_t cmd,
+                                 const uint8_t *buf_1bpp,
+                                 uint16_t x1,
+                                 uint16_t y1,
+                                 uint16_t y2,
+                                 uint16_t aligned_w)
+{
+    uint8_t line_buf[EPD_W / 8];
+
+    if (cmd != 0x00) {
+        epd_hal_send_command(cmd);
+    }
+
+    for (uint16_t row = y1; row <= y2; row++) {
+        uint32_t src_index = row * (EPD_W / 8) + (x1 / 8);
+        memcpy(line_buf, &buf_1bpp[src_index], aligned_w / 8);
+        write_image_buffer(0x00, line_buf, aligned_w / 8);
     }
 }
 

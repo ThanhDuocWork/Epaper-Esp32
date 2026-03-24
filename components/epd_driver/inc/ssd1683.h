@@ -20,6 +20,11 @@ void ssd1683_draw_1bpp_partial(const uint8_t *buf_1bpp,
                                uint16_t y,
                                uint16_t w,
                                uint16_t h);
+void ssd1683_draw_1bpp_partial_sync_prev(const uint8_t *buf_1bpp,
+                                         uint16_t x,
+                                         uint16_t y,
+                                         uint16_t w,
+                                         uint16_t h);
 void ssd1683_draw_demo_box_text(void);
 
 #ifdef __cplusplus
